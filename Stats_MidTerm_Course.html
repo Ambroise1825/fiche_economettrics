@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stats Mid-Term Course</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: sticky lesson list on the left (desktop) / select on top (phone); one lesson at a time in a 70ch column; exercises sit in "worksheet" blocks under each notion */
+:root{
+  --bg:#f3f5f8; --paper:#ffffff; --ink:#18202b; --muted:#5a6676; --rule:#d9dee6;
+  --pen:#1f4fd1; --pen-soft:#e5ecfd; --ok:#17784a; --ok-soft:#e3f4ea; --bad:#b4232c; --bad-soft:#fbe6e7;
+  --sheet:#f8f9fb; --key:#fff6d6; --key-ink:#6b5200;
+  --spss-head:#eceff3; --spss-label:#f6f7f9;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161d; --paper:#19202a; --ink:#e6ebf2; --muted:#9aa6b6; --rule:#2e3846;
+  --pen:#8aa9ff; --pen-soft:#22305a; --ok:#5fd39a; --ok-soft:#163427; --bad:#ff8a8f; --bad-soft:#3d1c20;
+  --sheet:#151b24; --key:#3a3114; --key-ink:#f3d77a; --spss-head:#232c38; --spss-label:#1d2530; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#11161d; --paper:#19202a; --ink:#e6ebf2; --muted:#9aa6b6; --rule:#2e3846;
+  --pen:#8aa9ff; --pen-soft:#22305a; --ok:#5fd39a; --ok-soft:#163427; --bad:#ff8a8f; --bad-soft:#3d1c20;
+  --sheet:#151b24; --key:#3a3114; --key-ink:#f3d77a; --spss-head:#232c38; --spss-label:#1d2530; color-scheme:dark }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16.5px/1.6 var(--f-body);
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 72px}
+.shell{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:40px}
+@media (max-width:860px){.shell{grid-template-columns:minmax(0,1fr);gap:0}}
+header.top{max-width:1120px;margin:0 auto;padding-block:36px 24px;display:grid;gap:10px}
+.eyebrow{font:600 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pen)}
+h1{font:750 clamp(32px,5.5vw,48px)/1.05 var(--f-display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:66ch}
+.progress{display:flex;align-items:center;gap:12px;font:500 13px var(--f-mono);color:var(--muted)}
+.meter{flex:0 1 240px;height:6px;background:var(--rule);border-radius:3px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+/* sidebar */
+aside{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 16px);align-self:start;max-height:calc(100vh - 32px);overflow:auto;padding-bottom:16px}
+@media (max-width:860px){aside{display:none}}
+.part{font:600 11.5px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px}
+.part:first-child{margin-top:0}
+aside button{display:flex;gap:10px;align-items:baseline;width:100%;text-align:left;background:none;border:0;padding:7px 10px;border-radius:6px;color:var(--ink);font:500 14.5px/1.3 var(--f-body);cursor:pointer}
+aside button:hover{background:var(--paper)}
+aside button[aria-current="true"]{background:var(--pen-soft);color:var(--pen)}
+aside button .n{font:500 12px var(--f-mono);color:var(--muted);min-width:22px}
+aside button.done .n{color:var(--ok)}
+aside button.done .n::after{content:" ✓"}
+.mobile-nav{display:none;position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--bg);padding-block:8px;border-bottom:1px solid var(--rule)}
+@media (max-width:860px){.mobile-nav{display:block}}
+.mobile-nav select{width:100%;font:500 15px var(--f-body);padding:10px;border-radius:8px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--bg)}
+/* lesson */
+main{min-width:0}
+article.lesson{max-width:72ch;display:grid;gap:18px;padding-top:8px}
+.ltag{font:600 12px/1 var(--f-mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+h2{font:700 clamp(26px,4vw,34px)/1.1 var(--f-display);margin:0;text-wrap:balance}
+h3{font:600 20px/1.25 var(--f-display);margin:14px 0 0;text-wrap:balance}
+p{margin:0} ul,ol{margin:0;padding-left:22px;display:grid;gap:4px}
+.goal{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;font-size:15px}
+.goal b{font:600 12px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--pen);display:block;margin-bottom:4px}
+.key{background:var(--key);color:var(--key-ink);border-radius:8px;padding:12px 14px;font-size:15.5px}
+.key b{color:inherit}
+.trap{border-left:3px solid var(--bad);padding:2px 0 2px 14px;font-size:15.5px}
+.trap::before{content:"Exam trap · ";font:600 12px var(--f-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--bad)}
+.formula{font:500 17px/1.5 var(--f-mono);background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:12px 16px;overflow-x:auto;white-space:nowrap}
+.formula small{display:block;font:13px var(--f-body);color:var(--muted);white-space:normal}
+table.t{border-collapse:collapse;width:100%;font-size:14.5px}
+.tw{overflow-x:auto}
+table.t th,table.t td{border-bottom:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{font:600 12px var(--f-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.spss{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--paper)}
+.spss table{border-collapse:collapse;font:12.5px/1.35 var(--f-mono);font-variant-numeric:tabular-nums;min-width:100%}
+.spss caption{font:600 13px var(--f-body);text-align:left;padding:10px 12px 6px}
+.spss th,.spss td{border:1px solid var(--rule);padding:6px 9px;white-space:nowrap}
+.spss thead th{background:var(--spss-head);font-weight:600;text-align:center}
+.spss td{text-align:right} .spss td.lab{text-align:left;background:var(--spss-label)}
+code{font-family:var(--f-mono);font-size:.9em}
+figure{margin:0;display:grid;gap:6px} figcaption{font-size:13.5px;color:var(--muted)}
+svg text{font-family:var(--f-body)}
+/* worksheet */
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:18px;display:grid;gap:14px;margin-top:6px}
+.sheet > .sh{font:600 12px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pen);display:flex;justify-content:space-between;gap:8px}
+.ex{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;display:grid;gap:10px;min-width:0}
+.ex.ok{border-color:var(--ok)} .ex.no{border-color:var(--bad)}
+.ex .q{font-weight:500}
+.ex .opts{display:grid;gap:6px}
+.ex .opts button{text-align:left;font:15px/1.45 var(--f-body);color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:9px 12px;cursor:pointer}
+.ex .opts button:hover{border-color:var(--pen)}
+.ex .opts button.right{background:var(--ok-soft);border-color:var(--ok)}
+.ex .opts button.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.ex .why{font-size:15px;border-left:3px solid var(--rule);padding:2px 0 2px 12px}
+.ex.ok .why{border-color:var(--ok)} .ex.no .why{border-color:var(--bad)}
+.numrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.numrow input{font:500 16px var(--f-mono);width:140px;padding:8px 10px;border:1px solid var(--rule);border-radius:8px;background:var(--bg);color:var(--ink)}
+.btn{font:600 14.5px/1 var(--f-body);background:var(--pen);color:var(--paper);border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+.btn.ghost{background:none;color:var(--pen);border:1px solid var(--pen)}
+textarea{width:100%;min-height:70px;font:15px/1.5 var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;resize:vertical}
+details summary{cursor:pointer;font-weight:600;color:var(--pen)}
+details[open] summary{margin-bottom:8px}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px;padding-top:18px;border-top:1px solid var(--rule)}
+:focus-visible{outline:2px solid var(--pen);outline-offset:2px}
+/* widgets */
+.widget{background:var(--paper);border:1px solid var(--rule);border-radius:12px;padding:16px;display:grid;gap:12px}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.ctrls label{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.ctrls output{font:600 15px var(--f-mono);color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--pen)}
+.readout{font:500 14.5px/1.5 var(--f-mono);display:flex;flex-wrap:wrap;gap:6px 18px}
+.readout b{font-weight:600}
+.verdict{font-weight:600}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--paper);color:var(--muted);font:500 13.5px var(--f-body);padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--pen-soft);color:var(--pen)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="eyebrow">Econometrics &amp; Data Analysis · Mid-term course</div>
+  <h1>Stats Mid-Term Course</h1>
+  <p class="lede">Everything the mid-term covers (chapters 0 to 3.3 slide 21), taught one notion at a time. Read the lesson, then do the worksheet under it. A lesson gets its tick once you have every auto-checked exercise right.</p>
+  <div class="progress"><div class="meter"><i id="meter"></i></div><span id="ptext">0 of 15 lessons done</span></div>
+</header>
+
+<div class="mobile-nav"><label for="msel" class="eyebrow" style="display:block;margin-bottom:6px">Lesson</label><select id="msel"></select></div>
+
+<div class="shell">
+<aside id="side" aria-label="Lessons"></aside>
+<main id="main">
+
+<!-- ============ 1 ============ -->
+<article class="lesson" data-part="Foundations" data-title="Data vocabulary">
+  <div class="ltag">Lesson 1 · Chapter 0–1</div>
+  <h2>Data vocabulary: cases, variables, samples</h2>
+  <div class="goal"><b>You'll be able to</b>name each part of a dataset, tell a parameter from a statistic, and explain why we work on samples.</div>
+  <p>Every dataset in this course has the same shape: <b>one row per case and one column per variable</b>. A <b>case</b> is one individual, item, object or participant: a customer, a house, a car. A <b>variable</b> (also called a <b>feature</b>) is one attribute measured on each case: age, price, colour.</p>
+  <p>We almost never observe everyone. The <b>population</b> is the whole group we care about (all customers in France). The <b>sample</b> is the subset we actually measure (the 5,000 customers in <code>customer_dbase</code>). Inferential statistics means using the sample to say something about the population.</p>
+  <div class="tw"><table class="t">
+    <tr><th></th><th>Population</th><th>Sample</th></tr>
+    <tr><td>A number that describes it is a…</td><td><b>parameter</b></td><td><b>statistic</b></td></tr>
+    <tr><td>Mean</td><td>µ (mu)</td><td>x̄ (x-bar)</td></tr>
+    <tr><td>Standard deviation</td><td>σ (sigma)</td><td>s</td></tr>
+    <tr><td>Do we know it?</td><td>Almost never</td><td>Yes, we compute it</td></tr>
+  </table></div>
+  <div class="key"><b>Rule of thumb:</b> Greek letters are for the population (unknown), Latin letters are for the sample (known).</div>
+  <p>Why sample at all? A full census costs too much, some data are not available (a private profile), or they don't exist yet (not every house is on sale). The price of sampling is <b>risk</b>: a sample might not behave like the population, for example if you survey the children's table at a wedding. We accept a risk level, written <b>α</b>, usually 5%. In food safety or aerospace, 5% would be unacceptable.</p>
+  <p>Two ways to get a sample: a <b>simple random sample</b> gives every member of the <b>frame</b> (the list of the population) the same chance of being picked. A biased frame ruins everything: surveying tennis-club members to measure how much French people like tennis earns zero.</p>
+  <h3>The research process (simplified)</h3>
+  <ol><li>Initial question or observation</li><li>Collect <b>secondary data</b> (papers and documents that already exist)</li><li>Build a <b>theory</b>: a set of principles that explain behaviour and generate hypotheses. A theory must be testable.</li><li>Break it into testable <b>hypotheses</b></li><li>Collect data that are <b>accurate</b> (correct value), <b>valid</b> (measures the right thing), <b>reliable</b> (sourced and reproducible) and <b>relevant</b> (fits the context)</li><li>Analyse, conclude and report</li></ol>
+  <p class="trap">Observing what the theory predicts does not <i>prove</i> it. You only fail to reject it. Newton looked "right" until 1905.</p>
+  <h3>Variables by role</h3>
+  <ul><li><b>Independent variable (IV)</b>, also called explanatory variable or predictor: the assumed cause (surface, age of a house).</li><li><b>Dependent variable (DV)</b>, also called explained or outcome variable: the consequence (price). Usually there is one.</li><li><b>Extraneous variable:</b> something you didn't take into account that may affect the result (tasting mayonnaise at 8 AM vs 8 PM).</li><li><b>Control variable:</b> something you keep constant (same website design, only the colour changes).</li><li><b>Confounding (lurking) variable:</b> a third variable that drives both the IV and the DV (weather drives both ice-cream and sunglasses sales).</li></ul>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 1</span></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">In <code>customer_dbase</code>, one row describes one customer, and the column "income" holds their income. "Income" is…</p>
+      <div class="opts"><button>a case</button><button>a variable (feature)</button><button>a parameter</button><button>a population</button></div>
+      <p class="why">A column is a variable (or feature). A row is a case.</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">"The mean age of the 5,000 customers in our file is 46.94." The number 46.94 is…</p>
+      <div class="opts"><button>a parameter, written µ</button><button>an estimator</button><button>a statistic, written x̄</button><button>the population mean</button></div>
+      <p class="why">It is computed on a sample, so it is a statistic (x̄). The population mean µ is unknown.</p></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">You want to measure depression across countries using the number of antidepressants sold. Which data-quality property fails?</p>
+      <div class="opts"><button>Validity: you are measuring access to drugs, not depression</button><button>Accuracy</button><button>Reliability</button><button>None of them</button></div>
+      <p class="why">That is the slide's own example: the data are not valid, because they measure something other than what you intend.</p></div>
+    <div class="ex" data-type="open"><p class="q">Explain in one or two lines why we usually work with a sample and what the risk is.</p><textarea aria-label="Your answer"></textarea>
+      <details><summary>Model answer</summary><p>Studying the whole population is too costly, or the data are unavailable or don't exist. The risk is that the sample does not behave like the population, so our conclusion could be wrong. We accept a risk level α (e.g. 5%).</p></details></div>
+  </div>
+</article>
+
+<!-- ============ 2 ============ -->
+<article class="lesson" data-part="Foundations" data-title="Types of variables">
+  <div class="ltag">Lesson 2 · Chapter 1</div>
+  <h2>Types of variables, and why the type decides the tool</h2>
+  <div class="goal"><b>You'll be able to</b>classify any variable and spot when SPSS's coding hides its true type.</div>
+  <p>The first question about any variable: <b>does an average make sense?</b> If yes, it is quantitative. If no, it is qualitative (categorical).</p>
+  <div class="tw"><table class="t">
+    <tr><th>Family</th><th>Type</th><th>Test</th><th>Examples</th></tr>
+    <tr><td rowspan="3">Qualitative</td><td>Binary</td><td>2 outcomes</td><td>pass/fail, yes/no, close to the sea or not</td></tr>
+    <tr><td>Nominal</td><td>3+ categories, no order</td><td>colour, job category, zip code, department number</td></tr>
+    <tr><td>Ordinal</td><td>categories with a logical order</td><td>education level, rank in a race, unhappy → happy</td></tr>
+    <tr><td rowspan="4">Quantitative</td><td>Discrete</td><td>counts (integers)</td><td>number of children, number of visitors</td></tr>
+    <tr><td>Continuous</td><td>any value</td><td>weight, price, duration</td></tr>
+    <tr><td>Interval</td><td>zero is arbitrary, ratios meaningless</td><td>°C, calendar year</td></tr>
+    <tr><td>Ratio</td><td>true zero, ratios meaningful</td><td>length, money, time</td></tr>
+  </table></div>
+  <p><b>Likert scale</b> (strongly disagree … strongly agree): technically <b>ordinal</b>. With at least 7 points (some say 5), it is acceptable to treat it as quantitative by coding 1, 2, 3…</p>
+  <h3>In SPSS: coding is not meaning</h3>
+  <p>In Variable View, <b>Type</b> says how the value is stored (Numeric, String) and <b>Measure</b> says what it means (Nominal, Ordinal, Scale). Gender stored as 0/1 with labels 0 = Male and 1 = Female is still <b>nominal</b>. A zip code is a number, but averaging zip codes is meaningless, so it is nominal.</p>
+  <p class="trap">"Job category (1 = manager, 2 = sales…) should be Scale because it is numeric." Wrong: the numbers are only labels.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 2</span></div>
+    <div class="ex" data-type="mcq" data-a="3"><p class="q">Education: did not complete high school / high school / some college / college degree / post-graduate. This variable is…</p>
+      <div class="opts"><button>Quantitative and ordinal</button><button>Qualitative and nominal</button><button>Quantitative and discrete</button><button>Qualitative and ordinal</button></div>
+      <p class="why">Categories with a logical order make it qualitative and ordinal (a past-paper question).</p></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">"Temperature today in °C" is…</p>
+      <div class="opts"><button>Ratio: 20°C is twice as hot as 10°C</button><button>Interval: 0°C is an arbitrary zero</button><button>Ordinal</button><button>Nominal</button></div>
+      <p class="why">0°C does not mean "no temperature", so ratios have no meaning. That makes it interval.</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">In SPSS, "zip code" has Type = Numeric and Measure = Nominal. This is…</p>
+      <div class="opts"><button>an error: numeric variables must be Scale</button><button>an error: it should be String</button><button>correct: stored as a number, but it means a category</button><button>correct only if there are fewer than 7 zip codes</button></div>
+      <p class="why">Storage (numeric) and meaning (nominal) are separate settings. A zip code is a label.</p></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">Satisfaction scored from 0 to 10, any number accepted in between, is best described as…</p>
+      <div class="opts"><button>quantitative continuous</button><button>binary</button><button>nominal</button><button>discrete count</button></div>
+      <p class="why">Any value between 0 and 10 is possible and an average makes sense, so it is quantitative continuous (the slide's "mini challenge").</p></div>
+  </div>
+</article>
+
+<!-- ============ 3 ============ -->
+<article class="lesson" data-part="Describing data" data-title="One variable &amp; outliers">
+  <div class="ltag">Lesson 3 · Chapter 1</div>
+  <h2>Describing one variable: centre, spread, box plot, outliers</h2>
+  <div class="goal"><b>You'll be able to</b>pick the right summary, read a box plot and compute the outlier fences.</div>
+  <h3>Centre</h3>
+  <p><b>Mean:</b> the average. <b>Median:</b> the middle value of the ordered data (Q2). <b>Mode:</b> the most frequent value. The mean is <b>sensitive</b> to outliers and the median is <b>resistant</b>, so prefer the median when there are extreme values.</p>
+  <p>Example: 4, 7, 7, 9, 12 has mean 7.8 and median 7. Add one billionaire-style value, 60: the mean jumps to 16.5, but the median only moves to 8.</p>
+  <h3>Position and spread</h3>
+  <p><b>Quartiles:</b> Q1 = 25th percentile, Q2 = median, Q3 = 75th percentile. The <b>five-number summary</b> is min, Q1, median, Q3, max. <b>IQR = Q3 − Q1</b>, the range of the middle 50%. The <b>standard deviation</b> s measures the typical distance to the mean. For a sample it divides by <b>n − 1</b>, which makes it an unbiased estimator; dividing by n would underestimate σ.</p>
+  <figure>
+    <svg viewBox="0 0 640 150" role="img" aria-label="Box plot with fences" style="width:100%;height:auto">
+      <line x1="40" y1="110" x2="600" y2="110" stroke="var(--rule)"/>
+      <g fill="var(--muted)" font-size="12" text-anchor="middle"><text x="60" y="130">18</text><text x="160" y="130">32 (Q1)</text><text x="250" y="130">46 (median)</text><text x="370" y="130">62 (Q3)</text><text x="460" y="130">79 (max)</text><text x="560" y="130">107 (upper fence)</text></g>
+      <line x1="60" y1="60" x2="160" y2="60" stroke="var(--ink)" stroke-width="1.5"/><line x1="370" y1="60" x2="460" y2="60" stroke="var(--ink)" stroke-width="1.5"/>
+      <line x1="60" y1="45" x2="60" y2="75" stroke="var(--ink)" stroke-width="1.5"/><line x1="460" y1="45" x2="460" y2="75" stroke="var(--ink)" stroke-width="1.5"/>
+      <rect x="160" y="35" width="210" height="50" fill="var(--pen-soft)" stroke="var(--pen)" stroke-width="1.5" rx="2"/>
+      <line x1="250" y1="35" x2="250" y2="85" stroke="var(--pen)" stroke-width="2.5"/>
+      <line x1="560" y1="25" x2="560" y2="100" stroke="var(--bad)" stroke-dasharray="4 4"/>
+      <text x="265" y="25" font-size="12" fill="var(--muted)" text-anchor="middle">box = middle 50% (IQR = 30)</text>
+    </svg>
+    <figcaption>Ages in <code>customer_dbase</code>: Q1 = 32, median = 46, Q3 = 62. Upper fence = 62 + 1.5 × 30 = 107, so nobody is an outlier here.</figcaption>
+  </figure>
+  <div class="formula">lower fence = Q1 − 1.5 × IQR &nbsp;&nbsp;·&nbsp;&nbsp; upper fence = Q3 + 1.5 × IQR<small>A value outside the fences is a <b>potential outlier</b>: an unexpected, faulty or extreme value. SPSS draws it as a circle or star.</small></div>
+  <p class="trap">SPSS labels each outlier dot with its <b>case number</b> (the row), not its value. "Max value = 38" when 38 is a row number cost points in 2024.</p>
+  <h3>Charts</h3>
+  <p><b>Histogram:</b> one quantitative variable grouped into classes. The bar height is the count (or %). Use it to see shape and outliers. <b>Bar or pie chart:</b> one qualitative variable, with a summary table of frequencies and percentages.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 3</span></div>
+    <div class="ex" data-type="num" data-a="57.5" data-tol="0.01"><p class="q">Q1 = 20 and Q3 = 35. Compute the <b>upper fence</b>.</p>
+      <div class="numrow"><input inputmode="decimal" aria-label="Upper fence"><button class="btn">Check</button></div>
+      <p class="why">IQR = 15, so 35 + 1.5 × 15 = 35 + 22.5 = 57.5.</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">Household incomes include a few multimillionaires. Which central measure is more appropriate?</p>
+      <div class="opts"><button>The mean, because it uses all the values</button><button>The mode</button><button>The median, because it resists outliers</button><button>The standard deviation</button></div>
+      <p class="why">Outliers pull the mean, not the median.</p></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">In a box plot of "income by job category", a dot above the Services box is labelled 533. You can say…</p>
+      <div class="opts"><button>the maximum income in Services is 533</button><button>case number 533 is a potential outlier among Services</button><button>533 people in Services are outliers</button><button>the median is 533</button></div>
+      <p class="why">The label is the row (case) number.</p></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">What percentage of the cases lie inside the box of a box plot?</p>
+      <div class="opts"><button>50%</button><button>25%</button><button>95%</button><button>75%</button></div>
+      <p class="why">The box runs from Q1 to Q3, which holds the middle 50%.</p></div>
+  </div>
+</article>
+
+<!-- ============ 4 ============ -->
+<article class="lesson" data-part="Describing data" data-title="Two variables: correlation">
+  <div class="ltag">Lesson 4 · Chapter 1</div>
+  <h2>Two variables: scatter plots and the three correlations</h2>
+  <div class="goal"><b>You'll be able to</b>choose between Pearson, Spearman and Kendall, and read r.</div>
+  <p>With two quantitative variables, always <b>draw a scatter plot first</b> (explanatory variable on the x-axis). Read four things: <b>direction</b> (up or down), <b>shape</b> (linear or not), <b>strength</b> (how tightly the dots hug a line) and <b>bivariate outliers</b>.</p>
+  <div class="tw"><table class="t">
+    <tr><th>Situation</th><th>Use</th></tr>
+    <tr><td>2 quantitative, <b>linear</b> relationship, few outliers (roughly normal)</td><td><b>Pearson's r</b> (ρ in the population)</td></tr>
+    <tr><td>2 quantitative, <b>monotonic but not linear</b> (always rising, e.g. log or exponential)</td><td><b>Spearman's rank correlation</b> (works on ranks)</td></tr>
+    <tr><td>2 <b>ordinal</b>, or 1 ordinal + 1 quantitative</td><td><b>Spearman</b> or <b>Kendall's τ</b> (Kendall suits small samples and many ties)</td></tr>
+    <tr><td>Not linear and not monotonic (a U shape)</td><td>No correlation coefficient. Use regression (chapter 4)</td></tr>
+  </table></div>
+  <p>All three lie between <b>−1 and +1</b>. The sign gives the direction. Values near 0 mean no linear (Pearson) or monotonic (Spearman) link, though another kind of link may exist.</p>
+  <div class="formula">|r| &lt; 0.4 weak · 0.4–0.6 moderate · &gt; 0.6 strong</div>
+  <p>Anscombe's four datasets all have the same r, but Pearson is legitimate only for the first: the second is curved, the third has an outlier, and in the fourth X is constant except for one point. That is why you look at the plot.</p>
+  <div class="key"><b>Correlation does not imply causation.</b> Look for a confounding variable (weather drives both ice cream and sunglasses), reverse causality, coincidence (spurious correlation) and data collected over time.</div>
+  <p class="trap">Pearson on two ordinal variables is wrong. The question "relationship between brand and colour" (two nominal variables) is not a correlation question at all: use a crosstab (lesson 5).</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 4</span></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">Price of a car (€) and its quality rating (ordinal, 10 levels). Which method?</p>
+      <div class="opts"><button>Pearson</button><button>Contingency table</button><button>Spearman or Kendall</button><button>Box plot only</button></div>
+      <p class="why">One quantitative and one ordinal variable call for a rank correlation (2024 mid-term, 0.5 pt).</p></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">The scatter plot of speed vs price shows a clear straight upward pattern, no outliers. Which method, and under what assumption?</p>
+      <div class="opts"><button>Kendall, because the variables are quantitative</button><button>Pearson, which assumes a linear relationship (and few outliers)</button><button>Spearman, because the link is linear</button><button>Chi² test</button></div>
+      <p class="why">Two quantitative variables with a linear relationship call for Pearson. Spearman would be accepted if you justified a monotonic relationship.</p></div>
+    <div class="ex" data-type="mcq" data-a="3"><p class="q">SPSS gives r = 0.684 between "years of education" and "spouse's years of education". Best reading?</p>
+      <div class="opts"><button>More education causes the spouse to study longer</button><button>Weak negative link</button><button>No linear link</button><button>Strong positive linear association, which says nothing about causation</button></div>
+      <p class="why">|r| &gt; 0.6 is strong and the sign is positive. Causation cannot be read from r.</p></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">The scatter plot is U-shaped (falls, then rises). Pearson r ≈ 0.02. Conclusion?</p>
+      <div class="opts"><button>There may be a strong non-linear link that neither Pearson nor Spearman captures</button><button>The variables are unrelated</button><button>Use Spearman, which will be close to 1</button><button>It is a spurious correlation</button></div>
+      <p class="why">r ≈ 0 only rules out a linear link. A U shape is not monotonic either, so you need regression.</p></div>
+  </div>
+</article>
+
+<!-- ============ 5 ============ -->
+<article class="lesson" data-part="Describing data" data-title="Crosstabs">
+  <div class="ltag">Lesson 5 · Chapter 1</div>
+  <h2>Two qualitative variables: reading a crosstab</h2>
+  <div class="goal"><b>You'll be able to</b>read "the % of A given B" correctly every time.</div>
+  <p>A <b>contingency table</b> (SPSS calls it a crosstab) counts the cases in every combination of two qualitative variables. The trap is always the percentage: is it % of the <b>row</b>, % of the <b>column</b>, or % of the <b>total</b>?</p>
+  <div class="spss"><table><caption>Gender * Netflix Crosstabulation (Count)</caption>
+    <thead><tr><th></th><th>Netflix = Yes</th><th>Netflix = No</th><th>Total</th></tr></thead>
+    <tbody><tr><td class="lab">Male</td><td>186</td><td>2263</td><td>2449</td></tr><tr><td class="lab">Female</td><td>217</td><td>2334</td><td>2551</td></tr><tr><td class="lab">Total</td><td>403</td><td>4597</td><td>5000</td></tr></tbody></table></div>
+  <div class="key"><b>Method:</b> "% of A <i>given</i> B" means "among the B, what share are A". Divide by the <b>total of B</b>.<br>% subscribed <i>given</i> male = 186 / 2449 = 7.6% (within the Male row).<br>% male <i>given</i> subscribed = 186 / 403 = 46.2% (within the Yes column).</div>
+  <p>Same cell, two different percentages. SPSS prints both as "% within Gender" and "% within Netflix". Pick the one whose "given" group matches the question.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 5</span></div>
+    <div class="ex" data-type="num" data-a="8.5" data-tol="0.1"><p class="q">Using the table above: what % of women subscribed? (one decimal)</p>
+      <div class="numrow"><input inputmode="decimal" aria-label="Percent"><span>%</span><button class="btn">Check</button></div>
+      <p class="why">Given female, use the Female row: 217 / 2551 = 8.5%.</p></div>
+    <div class="ex" data-type="num" data-a="53.8" data-tol="0.1"><p class="q">What % of subscribers are women? (one decimal)</p>
+      <div class="numrow"><input inputmode="decimal" aria-label="Percent"><span>%</span><button class="btn">Check</button></div>
+      <p class="why">Given subscribed, use the Yes column: 217 / 403 = 53.8%.</p></div>
+    <div class="ex" data-type="num" data-a="4.3" data-tol="0.1"><p class="q">What % of the whole sample are female subscribers? (one decimal)</p>
+      <div class="numrow"><input inputmode="decimal" aria-label="Percent"><span>%</span><button class="btn">Check</button></div>
+      <p class="why">% of total: 217 / 5000 = 4.3%.</p></div>
+  </div>
+</article>
+
+<!-- ============ 6 ============ -->
+<article class="lesson" data-part="Sampling &amp; intervals" data-title="Standard error &amp; CLT">
+  <div class="ltag">Lesson 6 · Chapter 2</div>
+  <h2>Sample means vary: standard error and the Central Limit Theorem</h2>
+  <div class="goal"><b>You'll be able to</b>give and use the formula of the standard deviation of the sample mean, and say why n matters.</div>
+  <p>Imagine drawing many samples of size n from the same wedding (N = 300 guests, µ = 40, σ = 10) and computing x̄ each time. You get a different x̄ each time. Those sample means form their own distribution, the <b>sampling distribution of x̄</b>.</p>
+  <div class="formula">σ<sub>x̄</sub> = σ / √n &nbsp;&nbsp; estimated by &nbsp;&nbsp; SE = s / √n<small>The standard deviation of the sample mean, also called the standard error. It is the spread <b>between samples</b>.</small></div>
+  <ul><li>Larger <b>n</b> → smaller σ<sub>x̄</sub>: big samples give means that cluster near µ.</li><li>Larger <b>σ</b> (individuals more spread out) → larger σ<sub>x̄</sub>.</li><li>To <b>halve</b> the standard error you must <b>quadruple</b> n (because of the square root), so you get diminishing returns.</li></ul>
+  <div class="key"><b>Don't mix up two standard deviations.</b> s = spread of <i>individuals</i> inside one sample. s/√n = spread of <i>sample means</i> from sample to sample.</div>
+  <p><b>Central Limit Theorem:</b> as n grows, the distribution of x̄ becomes <b>normal</b>, centred on µ, with standard deviation σ/√n, whatever the shape of the original variable. This is why we need large samples. With a small n we can only rely on normality if the variable itself is normal.</p>
+  <h3>Estimator vs estimate</h3>
+  <p>An <b>estimator</b> is a rule, defined before you see data: "take 10 random guests and average their ages". An <b>estimate</b> is the number that rule gives on one sample: "34". A good estimator is <b>unbiased</b> (no systematic error), <b>consistent</b> (better as n grows), <b>efficient</b> (most accurate for a given n) and <b>robust</b> (resists outliers). No estimator has all four.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 6</span></div>
+    <div class="ex" data-type="num" data-a="2" data-tol="0.01"><p class="q">σ = 10, n = 25. Compute σ<sub>x̄</sub>.</p>
+      <div class="numrow"><input inputmode="decimal" aria-label="Standard error"><button class="btn">Check</button></div>
+      <p class="why">10 / √25 = 10 / 5 = 2.</p></div>
+    <div class="ex" data-type="num" data-a="100" data-tol="0"><p class="q">Same σ = 10. What sample size gives σ<sub>x̄</sub> = 1?</p>
+      <div class="numrow"><input inputmode="numeric" aria-label="Sample size"><button class="btn">Check</button></div>
+      <p class="why">10 / √n = 1 gives √n = 10, so n = 100. Halving the standard error (2 → 1) took 4 times the sample (25 → 100).</p></div>
+    <div class="ex" data-type="mcq" data-a="3"><p class="q">Select the correct sentence.</p>
+      <div class="opts"><button>The standard error increases when n increases.</button><button>The standard error decreases when σ increases.</button><button>A sample larger than 20 always behaves like the population.</button><button>The risk that x̄ is far from µ decreases when n increases.</button></div>
+      <p class="why">A larger n gives a smaller σ/√n, so the sample mean is more likely to be near µ. Nothing is guaranteed ("always" is a red flag).</p></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">"An estimator is a number obtained after selecting a sample, e.g. 20 for the mean age." This is…</p>
+      <div class="opts"><button>correct</button><button>wrong: that number is the estimate; the estimator is the rule</button><button>wrong: an estimator is a population value</button><button>correct only for means</button></div>
+      <p class="why">Estimator = method. Estimate = the number it gives.</p></div>
+  </div>
+</article>
+
+<!-- ============ 7 ============ -->
+<article class="lesson" data-part="Sampling &amp; intervals" data-title="Confidence intervals">
+  <div class="ltag">Lesson 7 · Chapter 2</div>
+  <h2>Confidence intervals and the margin of error</h2>
+  <div class="goal"><b>You'll be able to</b>write the formula, explain each part's effect on the margin of error, and interpret an interval correctly.</div>
+  <p>A single number (x̄) is almost never exactly µ. A confidence interval gives a range we are confident contains µ:</p>
+  <div class="formula">x̄ ± t<sub>α/2, n−1</sub> × s / √n<small>point estimate ± margin of error, where ME = critical value × standard error = t<sub>α/2, n−1</sub> × s/√n. If σ is known (rare), use Z<sub>α/2</sub> × σ/√n (Z = 1.96 at 95%).</small></div>
+  <p>We use <b>Student's t</b> instead of Z because σ is unknown and estimated by s. That extra uncertainty widens the interval. With more degrees of freedom (n − 1), t gets closer to Z: at 95%, t ≈ 2.01 for n = 50 and ≈ 1.98 for n = 100, against 1.96 for Z.</p>
+
+  <div class="widget" id="me-widget">
+    <div class="ctrls">
+      <label for="me-n">Sample size n <output id="me-n-o">100</output><input type="range" id="me-n" min="10" max="1000" step="1" value="100"></label>
+      <label for="me-s">Standard deviation s <output id="me-s-o">8</output><input type="range" id="me-s" min="1" max="30" step="0.5" value="8"></label>
+      <label>Confidence level<span class="seg" id="me-cl"><button aria-pressed="false" data-z="1.645">90%</button><button aria-pressed="true" data-z="1.96">95%</button><button aria-pressed="false" data-z="2.576">99%</button></span></label>
+    </div>
+    <svg viewBox="0 0 640 90" role="img" aria-label="Confidence interval around the sample mean" style="width:100%;height:auto">
+      <line x1="20" y1="50" x2="620" y2="50" stroke="var(--rule)"/>
+      <rect id="me-bar" x="300" y="38" width="40" height="24" rx="4" fill="var(--pen-soft)" stroke="var(--pen)" stroke-width="1.5"/>
+      <line x1="320" y1="30" x2="320" y2="70" stroke="var(--pen)" stroke-width="2.5"/>
+      <text x="320" y="22" text-anchor="middle" font-size="12" fill="var(--muted)">x̄ = 34</text>
+      <text id="me-lb" x="300" y="84" text-anchor="middle" font-size="12" fill="var(--ink)"></text>
+      <text id="me-ub" x="340" y="84" text-anchor="middle" font-size="12" fill="var(--ink)"></text>
+      <g fill="var(--muted)" font-size="11" text-anchor="middle"><text x="20" y="44">24</text><text x="620" y="44">44</text></g>
+    </svg>
+    <div class="readout"><span>SE = s/√n = <b id="me-se"></b></span><span>ME = <b id="me-me"></b></span><span id="me-warn" class="verdict"></span></div>
+    <p style="font-size:13.5px;color:var(--muted)">Uses the large-sample critical values (1.645 / 1.96 / 2.576). With t the interval is slightly wider for small n.</p>
+  </div>
+
+  <div class="tw"><table class="t">
+    <tr><th>If this goes up…</th><th>Margin of error</th><th>Why</th></tr>
+    <tr><td>Sample size n</td><td><b>Down</b></td><td>√n is in the denominator: more information</td></tr>
+    <tr><td>Standard deviation s</td><td><b>Up</b></td><td>more spread between individuals</td></tr>
+    <tr><td>Confidence level (95 → 99%)</td><td><b>Up</b></td><td>a larger critical value t is needed</td></tr>
+    <tr><td>Risk α (α = 1 − confidence)</td><td><b>Down</b></td><td>a smaller t: narrower but riskier</td></tr>
+  </table></div>
+  <h3>Interpreting it, the way the exam wants</h3>
+  <ul><li>✔ "We are 95% confident that, <b>in the population</b>, the mean is between LB and UB."</li><li>✔ If we drew many samples, about 95% of their intervals would contain µ.</li><li>✘ "There is a 95% probability that µ is in [LB, UB]." µ is fixed: it is either inside a given interval or not.</li><li>✘ "95% of the data are in the interval." The interval is about the mean, not about individuals.</li><li>✘ "We are 95% confident that the <i>sample</i> mean is in…" You already know the sample mean exactly.</li></ul>
+  <p class="trap">Sample-size rule: n &gt; 50, use the formula. n &lt; 30, only if the variable is normal; otherwise STOP, the interval is unreliable. An interval for a group of 28 should not be reported.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 7</span></div>
+    <div class="ex" data-type="num" data-a="1.59" data-tol="0.03"><p class="q">n = 100, x̄ = 34, s = 8, t<sub>0.025, 99</sub> = 1.984. Compute the margin of error (2 decimals).</p>
+      <div class="numrow"><input inputmode="decimal" aria-label="Margin of error"><button class="btn">Check</button></div>
+      <p class="why">SE = 8 / √100 = 0.8, so ME = 1.984 × 0.8 = 1.587 ≈ 1.59. The interval is [32.41 ; 35.59].</p></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">You go from 95% to 99% confidence, keeping the same sample. The interval…</p>
+      <div class="opts"><button>gets wider</button><button>gets narrower</button><button>stays the same</button><button>moves to the right</button></div>
+      <p class="why">The critical value rises (1.96 → 2.576), so ME rises.</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">Problem 2 from your course: 30 customers spend on average 1723.4€ (s = 89.55). Nothing is known about the distribution. The 95% CI…</p>
+      <div class="opts"><button>is [1689 ; 1756]</button><button>must use Z because n = 30</button><button>is unreliable: the sample is too small and normality is unknown</button><button>is exact because n ≥ 30</button></div>
+      <p class="why">The course's "huge trap": with a small n and unknown normality, there is no safe answer.</p></div>
+    <div class="ex" data-type="open"><p class="q">SPSS gives a 95% CI of [4.5 ; 6.3] for the mean age of cars. Write the exact interpretation (0.5 pt on the 2024 exam).</p><textarea aria-label="Your answer"></textarea>
+      <details><summary>Model answer</summary><p>We are 95% confident that, in the population, the mean age of cars is between 4.5 and 6.3 years.</p></details></div>
+    <div class="ex" data-type="open"><p class="q">Market study problem (course problem 3): 255,000 expected customers, 1,500 sampled, mean spend 21€, s = 5€. The agency claims turnover will be at least 5,400,000€. Are they right?</p><textarea aria-label="Your answer"></textarea>
+      <details><summary>Model answer</summary><p>ME ≈ 1.96 × 5/√1500 = 0.25, so the 95% CI per customer is about [20.75 ; 21.25]€. Times 255,000, turnover is roughly between 5.29M€ and 5.42M€. 5.4M€ is near the top of the interval, so we cannot say it is "at least" 5.4M€: the agency is wrong.</p></details></div>
+  </div>
+</article>
+
+<!-- ============ 8 ============ -->
+<article class="lesson" data-part="Hypothesis testing" data-title="H0 and H1">
+  <div class="ltag">Lesson 8 · Chapter 3 part 1</div>
+  <h2>Writing the null and alternative hypotheses</h2>
+  <div class="goal"><b>You'll be able to</b>turn any question into H0 and H1 and say whether the test is one- or two-tailed.</div>
+  <p>A test checks a claim about the <b>population</b> using a sample. Think of a trial: the defendant is presumed <b>innocent</b> (H0) and is declared guilty (H1) only if the evidence is strong enough.</p>
+  <div class="tw"><table class="t">
+    <tr><th>H0, the null hypothesis</th><th>H1, the alternative hypothesis</th></tr>
+    <tr><td>Status quo, state of nature, historical value: what we assume</td><td>The claim, usually what the analyst wants to show</td></tr>
+    <tr><td><b>Always contains the equality</b>: =, ≤ or ≥</td><td>Never contains an equality: ≠, &lt; or &gt;</td></tr>
+    <tr><td>Innocent · not pregnant · vaccine has no effect · variables independent</td><td>Guilty · pregnant · vaccine works · variables dependent</td></tr>
+  </table></div>
+  <div class="tw"><table class="t">
+    <tr><th>Question wording</th><th>H0</th><th>H1</th><th>Tail</th></tr>
+    <tr><td>"Is it equal to 400?", "has it changed?"</td><td>µ = 400</td><td>µ ≠ 400</td><td>two-tailed (α/2 on each side)</td></tr>
+    <tr><td>"Has it increased above 46?"</td><td>µ ≤ 46</td><td>µ &gt; 46</td><td>right-tailed</td></tr>
+    <tr><td>"Has it decreased below 3?"</td><td>µ ≥ 3</td><td>µ &lt; 3</td><td>left-tailed</td></tr>
+  </table></div>
+  <p>The tail is named after where <b>H1</b> points. The expected value in H0 is written <b>µ<sub>0</sub></b> (or p<sub>0</sub> for a proportion).</p>
+  <p class="trap">Hypotheses use <b>µ</b>, never <b>x̄</b>. "H0: x̄ = 5" is always a wrong MCQ option. You already know x̄, so there is nothing to test about it.</p>
+  <p class="trap">"x̄ = 4 ≠ 5, so no test is needed." Wrong: a sample can differ from µ by chance. That is the whole point of testing.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 8</span></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">You believe the average beer price in the population is 5€. Your sample mean is 4€ (n = 10,000). You want to check whether the population mean is 5€ or not.</p>
+      <div class="opts"><button>H0: µ = 5 · H1: µ ≠ 5</button><button>H0: x̄ = 5 · H1: x̄ ≠ 5</button><button>H0: x̄ = 4 · H1: x̄ ≠ 4</button><button>No test needed: n is huge and 4 ≠ 5</button></div>
+      <p class="why">Population parameter, equality in H0, "equal or not" makes it two-tailed (2024 MCQ 2).</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">An electric car maker states its autonomy is 400 km. You suspect it is <b>lower</b>.</p>
+      <div class="opts"><button>H0: µ &lt; 400 · H1: µ ≥ 400</button><button>H0: µ = 400 · H1: µ ≠ 400</button><button>H0: µ ≥ 400 · H1: µ &lt; 400 (left-tailed)</button><button>H0: µ ≤ 400 · H1: µ &gt; 400</button></div>
+      <p class="why">The suspicion "lower" goes in H1 (&lt;), and the equality stays in H0 (≥).</p></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">Which statement about H0 is correct?</p>
+      <div class="opts"><button>If we fail to reject H0, we have proven H0 is true.</button><button>H0 is what we keep unless the sample gives enough evidence against it.</button><button>H0 never contains an equality.</button><button>H0 is what the analyst wants to prove.</button></div>
+      <p class="why">"Fail to reject" is not "prove". The claim belongs in H1.</p></div>
+  </div>
+</article>
+
+<!-- ============ 9 ============ -->
+<article class="lesson" data-part="Hypothesis testing" data-title="Errors &amp; α">
+  <div class="ltag">Lesson 9 · Chapter 3 part 1</div>
+  <h2>Type I and Type II errors: what α really is</h2>
+  <div class="goal"><b>You'll be able to</b>define α and β without mixing them up.</div>
+  <p>Because we decide from a sample, we can be wrong in two ways. The course uses a pregnancy test: H0 = "Anna is not pregnant".</p>
+  <div class="tw"><table class="t">
+    <tr><th>Decision ↓ / Reality →</th><th>H0 true (not pregnant)</th><th>H1 true (pregnant)</th></tr>
+    <tr><td>Do not reject H0</td><td>✔ correct (1 − α)</td><td><b>Type II error</b>, false negative (β)</td></tr>
+    <tr><td>Reject H0</td><td><b>Type I error</b>, false positive or false alarm (α)</td><td>✔ correct (1 − β, the power)</td></tr>
+  </table></div>
+  <div class="formula">α = P(conclude H1 | H0 true) &nbsp;·&nbsp; β = P(conclude H0 | H1 true)<small>α is the <b>significance level</b>, chosen before the test (usually 5%). Power (1 − β) is not covered this semester.</small></div>
+  <ul><li>Lowering α (fewer false alarms) raises β (more missed detections). It is a trade-off.</li><li>α does not shrink by itself when n grows. You choose it.</li><li>"Level of significance" (α) is not the same as "level of confidence" (1 − α).</li></ul>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 9</span></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">The α risk can be described as…</p>
+      <div class="opts"><button>the probability of concluding H1 when H0 is in fact true</button><button>the probability of concluding H0 when H1 is true</button><button>the probability that H1 is correct</button><button>the probability of observing a value inside the critical values</button></div>
+      <p class="why">A Type I error, or false positive.</p></div>
+    <div class="ex" data-type="mcq" data-a="3"><p class="q">A smoke detector is tuned so it almost never rings for burnt toast. The cost is that it misses some real fires. In test terms, it lowered…</p>
+      <div class="opts"><button>β, and raised α</button><button>the sample size</button><button>the power</button><button>α (false alarms), and raised β (missed detections)</button></div>
+      <p class="why">Fewer false positives means more false negatives.</p></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">"When the sample size increases, α always decreases." This is…</p>
+      <div class="opts"><button>true</button><button>false: α is the risk level we choose</button><button>true only for two-tailed tests</button><button>true only with Student's t</button></div>
+      <p class="why">α is set by the analyst (2023 MCQ trap).</p></div>
+  </div>
+</article>
+
+<!-- ============ 10 ============ -->
+<article class="lesson" data-part="Hypothesis testing" data-title="tSTAT, critical values, df">
+  <div class="ltag">Lesson 10 · Chapter 3 part 1</div>
+  <h2>tSTAT, critical values and degrees of freedom</h2>
+  <div class="goal"><b>You'll be able to</b>explain how the old "bounds" method decides, and define degrees of freedom.</div>
+  <p>Wedding example: H0 says µ = 30. Our sample (n = 100) gives x̄ = 25 with s = 20. Is 25 "far" from 30? To judge, we measure the gap in units of standard error:</p>
+  <div class="formula">tSTAT = (x̄ − µ<sub>0</sub>) / (s/√n) = (25 − 30) / (20/√100) = −5 / 2 = −2.5</div>
+  <p>The <b>critical values</b> ±t<sub>α/2</sub> are the bounds that leave α/2 = 2.5% in each tail. With 99 df, t<sub>0.025</sub> ≈ 1.98 (about 2). Since −2.5 &lt; −1.98, the observation lies <b>outside</b> the bounds, so we <b>reject H0</b>: at a 5% level the mean age is not 30.</p>
+  <ul><li><b>Expected value:</b> µ<sub>0</sub> (from H0). <b>Observed value:</b> x̄ (from the sample).</li><li><b>Standard deviation of the sample</b> s: spread of individuals. <b>Standard deviation between samples</b> s/√n: the standard error.</li></ul>
+  <h3>Degrees of freedom</h3>
+  <p>The course's imperfect definition: <b>"the quantity of information available above the minimum needed to obtain a result"</b>, or the number of values free to vary. If 5 ages must average 20 and you choose 4 of them freely, the 5th is forced. That gives 4 = n − 1 degrees of freedom.</p>
+  <ul><li>One-sample t test: <b>df = n − 1</b>. Two independent samples: <b>df = n − 2</b> (you need at least one person per group). So df is not always n − 1.</li><li>More df means more information, which is desirable. The t distribution then gets closer to the normal distribution.</li></ul>
+  <p>You won't read statistical tables in the exam: SPSS gives tSTAT and the p-value (next lesson).</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 10</span></div>
+    <div class="ex" data-type="num" data-a="-2.67" data-tol="0.01"><p class="q">H0: µ = 50. Sample: n = 64, x̄ = 46, s = 12. Compute tSTAT (2 decimals).</p>
+      <div class="numrow"><input inputmode="decimal" aria-label="t statistic"><button class="btn">Check</button></div>
+      <p class="why">SE = 12 / √64 = 1.5, so t = (46 − 50) / 1.5 = −2.67.</p></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">With 63 df the critical value is about ±2.00 (α = 5%, two-tailed). With the tSTAT you just found…</p>
+      <div class="opts"><button>Fail to reject H0, because t is negative</button><button>Reject H0: −2.67 is beyond −2.00, outside the bounds</button><button>Reject H0, because 46 ≠ 50</button><button>We accept H1 and have proven µ ≠ 50</button></div>
+      <p class="why">|tSTAT| = 2.67 &gt; 2.00 puts the observation in the rejection zone. "46 ≠ 50" alone proves nothing, and we never "prove" H1.</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">Select the correct sentence about degrees of freedom.</p>
+      <div class="opts"><button>Always n − 1 for any test.</button><button>A larger number means less information and a less accurate test.</button><button>Information available above the minimum needed; for a one-sample t test, df = n − 1.</button><button>df = N − n.</button></div>
+      <p class="why">That is the definition the exam accepts.</p></div>
+  </div>
+</article>
+
+<!-- ============ 11 ============ -->
+<article class="lesson" data-part="Hypothesis testing" data-title="The p-value">
+  <div class="ltag">Lesson 11 · Chapter 3 part 1</div>
+  <h2>The p-value: the one number you compare with α</h2>
+  <div class="goal"><b>You'll be able to</b>define the p-value in your own words, decide with it, and word the conclusion.</div>
+  <div class="key"><b>Definition:</b> the p-value is the probability, <b>if H0 is true</b>, of getting a sample result <b>as extreme or more extreme</b> than the one we observed. Geometrically, it is the area beyond the observed value, so it is always between 0 and 1.</div>
+  <p>If that probability is tiny, our sample would be very surprising in a world where H0 is true. Either we drew a freakishly unrepresentative sample (unlikely), or H0 is wrong. We bet on the second and <b>reject H0</b>.</p>
+
+  <div class="widget" id="pv-widget">
+    <div class="ctrls">
+      <label for="pv-t">Observed tSTAT <output id="pv-t-o">-2.50</output><input type="range" id="pv-t" min="-4" max="4" step="0.01" value="-2.5"></label>
+      <label>Test<span class="seg" id="pv-tail"><button aria-pressed="true" data-tail="two">Two-tailed</button><button aria-pressed="false" data-tail="left">Left</button><button aria-pressed="false" data-tail="right">Right</button></span></label>
+    </div>
+    <svg id="pv-svg" viewBox="0 0 640 210" role="img" aria-label="Distribution of the test statistic under H0 with the p-value area shaded" style="width:100%;height:auto"></svg>
+    <div class="readout"><span>p-value = <b id="pv-p"></b></span><span>α = 0.05</span><span class="verdict" id="pv-v"></span></div>
+    <p style="font-size:13.5px;color:var(--muted)">Large-sample curve (normal). The dashed lines are the 5% critical values. Notice that tSTAT beyond the critical line and p &lt; α always happen together: they are the same decision.</p>
+  </div>
+
+  <div class="formula">p-value &lt; α → reject H0 &nbsp;·&nbsp; p-value ≥ α → fail to reject H0</div>
+  <h3>Wording the conclusion (step 8)</h3>
+  <ul><li>Reject: "At a 5% level of significance, there is enough statistical evidence to reject H0. The mean price is not equal to 5€."</li><li>Fail to reject: "There is not enough statistical evidence, at a 5% level, to reject H0. The mean price might be equal to 5€."</li><li>Never say "H0 is true", "we accept H0" or "we proved H1".</li></ul>
+  <div class="tw"><table class="t"><tr><th>p-value</th><th>Plain-language label</th></tr><tr><td>&gt; 10%</td><td>not significant</td></tr><tr><td>5–10%</td><td>not very significant</td></tr><tr><td>1–5%</td><td>significant</td></tr><tr><td>0.1–1%</td><td>very significant</td></tr><tr><td>&lt; 0.1%</td><td>highly significant</td></tr></table></div>
+  <p class="trap">"The p-value is the probability that H0 (or H1) is true" or "the likelihood of H0": always wrong. Also compare with the α the question gives you: p = 0.03 is significant at 5% but <b>not</b> at 1%.</p>
+  <h3>The 8 steps of a test</h3>
+  <ol><li>Set up H0 and H1.</li><li>What are we working on? (mean, proportion, one or several groups…)</li><li>Choose the test.</li><li>Check the assumptions (sample size, normality…).</li><li>Choose α.</li><li>Read the p-value and compare it with α.</li><li>Decide: reject or fail to reject H0.</li><li>State the conclusion in context.</li></ol>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 11</span></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">Beer price, H0: µ = 5, α = 5%, n = 10,000, p-value = 0.04.</p>
+      <div class="opts"><button>p &lt; 5%, so H0 is true and the mean might be 5€.</button><button>We cannot reject H0; the mean might be 5€.</button><button>We reject H0 and conclude the mean price in the population is not 5€, at a 5% risk.</button><button>All other answers are wrong.</button></div>
+      <p class="why">0.04 &lt; 0.05, so reject (2024 MCQ 3).</p></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">T-shirts, H0: µ = 50€, α = 1%, n = 541, p = 0.03, tSTAT = 2.51. The sentence should end…</p>
+      <div class="opts"><button>"…the mean price might be 50€ at a 1% level; we cannot reject H0."</button><button>"…we reject H0 because p = 0.03."</button><button>"…we reject H0 because tSTAT &gt; 0.01."</button><button>"…the null hypothesis is true."</button></div>
+      <p class="why">0.03 &gt; 0.01, so fail to reject at α = 1% (2023 MCQ 15).</p></div>
+    <div class="ex" data-type="mcq" data-a="3"><p class="q">Select the <b>wrong</b> sentence.</p>
+      <div class="opts"><button>The p-value can be defined as an area.</button><button>When p is small compared with α, we reject H0.</button><button>A small p-value means H0 is not credible.</button><button>The p-value is the probability that H1 is right.</button></div>
+      <p class="why">The p-value is computed assuming H0 is true. It is not the probability of any hypothesis.</p></div>
+    <div class="ex" data-type="open"><p class="q">Define the p-value in your own words, in a way that makes sense (a self-test question).</p><textarea aria-label="Your answer"></textarea>
+      <details><summary>Model answer</summary><p>Assuming H0 is true, it is the probability of drawing another sample whose result is at least as far from H0 as ours. If it is very small (below α), our result would be very unusual under H0, so we reject H0.</p></details></div>
+  </div>
+</article>
+
+<!-- ============ 12 ============ -->
+<article class="lesson" data-part="Choosing &amp; running tests" data-title="The four questions">
+  <div class="ltag">Lesson 12 · Chapter 3 part 2</div>
+  <h2>Choosing the test: the four questions</h2>
+  <div class="goal"><b>You'll be able to</b>name the right test (with H0 and H1) for any situation. The exam expects the <i>whole</i> tree.</div>
+  <ol><li><b>How many groups or samples?</b> One (compare with a target). One sample with two variables (correlation or independence). Two. Three or more.</li><li><b>What are we working on?</b> A mean (or median), a dispersion, a proportion, a distribution, a correlation, or independence.</li><li><b>Independent or paired?</b> Only asked with 2+ groups. Paired means each value in one group is matched with one in the other: the same person before/after, twins, couples, the same product in two countries.</li><li><b>Assumptions met?</b> n &gt; 50 (both groups for two-sample tests)? Normality? Equal variances? If not, use the non-parametric backup.</li></ol>
+  <div class="tw"><table class="t">
+    <tr><th>Situation</th><th>Test</th><th>H0 / H1</th></tr>
+    <tr><td>1 sample · mean vs target</td><td><b>One-sample t test</b></td><td>µ = µ<sub>0</sub> / µ ≠ µ<sub>0</sub></td></tr>
+    <tr><td>1 sample · proportion (2 outcomes) vs target</td><td><b>Binomial test</b></td><td>p = p<sub>0</sub> / p ≠ p<sub>0</sub></td></tr>
+    <tr><td>1 sample · proportions (3+ outcomes) vs expected</td><td><b>Chi² goodness of fit</b></td><td>as expected / not as expected</td></tr>
+    <tr><td>1 sample, 2 quantitative · linear</td><td><b>Pearson correlation test</b></td><td>ρ = 0 / ρ ≠ 0</td></tr>
+    <tr><td>1 sample, 2 ordinal or monotonic</td><td><b>Spearman / Kendall</b></td><td>ρ<sub>s</sub> = 0 / ≠ 0</td></tr>
+    <tr><td>1 sample, 2 qualitative</td><td><b>Chi² test of independence</b> (Fisher's exact if an expected count &lt; 5)</td><td>independent / dependent</td></tr>
+    <tr><td>2 independent · mean</td><td><b>Independent t test</b> (equal variances) or <b>Welch</b> (unequal)</td><td>µ<sub>1</sub> = µ<sub>2</sub> / µ<sub>1</sub> ≠ µ<sub>2</sub></td></tr>
+    <tr><td>2 paired · mean</td><td><b>Paired t test</b></td><td>µ<sub>1</sub> = µ<sub>2</sub> / µ<sub>1</sub> ≠ µ<sub>2</sub></td></tr>
+    <tr><td>2+ independent · proportion</td><td><b>Chi² test</b></td><td>p<sub>1</sub> = p<sub>2</sub> / ≠</td></tr>
+    <tr><td>2+ independent · dispersion</td><td><b>Levene's test</b></td><td>σ²<sub>1</sub> = σ²<sub>2</sub> / ≠</td></tr>
+    <tr><td>3+ independent · mean</td><td><b>One-way ANOVA</b> (F test)</td><td>all µ equal / at least one differs</td></tr>
+    <tr><td>1 variable · normal?</td><td><b>Normality test</b> (Shapiro-Wilk)</td><td>normal / not normal</td></tr>
+  </table></div>
+  <p><b>Parametric</b> tests (t tests, ANOVA, Pearson) are more informative but rely on assumptions. <b>Non-parametric</b> backups (Wilcoxon, Mann-Whitney, Kruskal-Wallis) assume little.</p>
+  <p class="trap">"Is buying a smartphone (Y/N) linked to <b>age</b>?" is <b>two groups</b> (buyers vs non-buyers) compared on a mean, so a t test. "…linked to <b>nationality</b>?" is two qualitative variables, so Chi².</p>
+  <p class="trap">"Correlation between income and age" is <b>one</b> sample with two variables. It is neither independent nor paired.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 12</span></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">Is the average speed of blue cars equal to that of red cars? (large samples)</p>
+      <div class="opts"><button>One-sample t test</button><button>Independent-samples t test (or Welch if the variances differ)</button><button>Paired t test</button><button>Chi² test</button></div>
+      <p class="why">Two independent groups compared on a mean (2024 open question, 1 pt).</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">You cleaned the tanks and compare contamination in the <b>same tanks</b> before and after.</p>
+      <div class="opts"><button>Independent t test</button><button>ANOVA</button><button>Paired t test</button><button>Chi² test of independence</button></div>
+      <p class="why">The same tanks measured twice makes the data paired.</p></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">Is the proportion of red houses 20%?</p>
+      <div class="opts"><button>Binomial test</button><button>Chi² test of independence</button><button>One-sample t test</button><button>Pearson</button></div>
+      <p class="why">One sample, a proportion with 2 outcomes (red / not red), compared with a target.</p></div>
+    <div class="ex" data-type="mcq" data-a="3"><p class="q">Is preferred colour (blue/red/green) independent of gender? Several expected counts are below 5.</p>
+      <div class="opts"><button>Chi² test of independence</button><button>Spearman</button><button>Independent t test</button><button>Fisher's exact test (or its extension)</button></div>
+      <p class="why">Expected counts below 5 make Chi² unreliable, so use the exact test.</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">Compare mean contamination in four plants.</p>
+      <div class="opts"><button>Four one-sample t tests</button><button>Levene's test</button><button>One-way ANOVA</button><button>Paired t test</button></div>
+      <p class="why">Three or more independent groups compared on a mean.</p></div>
+    <div class="ex" data-type="open"><p class="q">Write H0 and H1 for: "Is the mean amount French and Spanish customers are willing to spend on a smartphone the same?"</p><textarea aria-label="Your answer"></textarea>
+      <details><summary>Model answer</summary><p>H0: µ<sub>French</sub> = µ<sub>Spanish</sub>; H1: µ<sub>French</sub> ≠ µ<sub>Spanish</sub>. Independent-samples t test (or Welch), provided both groups have n &gt; 50.</p></details></div>
+  </div>
+</article>
+
+<!-- ============ 13 ============ -->
+<article class="lesson" data-part="Choosing &amp; running tests" data-title="One-sample t test (SPSS)">
+  <div class="ltag">Lesson 13 · Chapter 3 part 3</div>
+  <h2>One-sample t test: reading the SPSS output</h2>
+  <div class="goal"><b>You'll be able to</b>read every column, especially the confidence interval of the <i>difference</i>.</div>
+  <p>Question: is the average price willing to be paid for a beer equal to 5€? H0: µ = 5, H1: µ ≠ 5, α = 5%. In SPSS: Analyze › Compare Means › One-Sample T Test, Test Value = 5.</p>
+  <div class="spss"><table><caption>One-Sample Statistics</caption><thead><tr><th></th><th>N</th><th>Mean</th><th>Std. Deviation</th><th>Std. Error Mean</th></tr></thead>
+    <tbody><tr><td class="lab">beer price</td><td>748</td><td>5.2150</td><td>1.87590</td><td>.06859</td></tr></tbody></table></div>
+  <div class="spss"><table><caption>One-Sample Test (Test Value = 5)</caption><thead><tr><th rowspan="2"></th><th rowspan="2">t</th><th rowspan="2">df</th><th colspan="2">Significance</th><th rowspan="2">Mean Difference</th><th colspan="2">95% CI of the Difference</th></tr><tr><th>One-Sided p</th><th>Two-Sided p</th><th>Lower</th><th>Upper</th></tr></thead>
+    <tbody><tr><td class="lab">beer price</td><td>3.134</td><td>747</td><td>&lt;.001</td><td>.002</td><td>.21498</td><td>.0803</td><td>.3496</td></tr></tbody></table></div>
+  <ul>
+    <li><b>N</b> = sample size. <b>Mean</b> = x̄ (observed value). <b>Std. Deviation</b> = s (spread of individuals). <b>Std. Error Mean</b> = s/√n.</li>
+    <li><b>t</b> = tSTAT = (5.215 − 5) / 0.0686 ≈ 3.13. <b>df</b> = n − 1.</li>
+    <li><b>Two-Sided p</b> (also "Sig. (2-tailed)") is the p-value for our two-tailed test: 0.002 &lt; 0.05, so <b>reject H0</b>.</li>
+    <li><b>Mean Difference</b> = x̄ − µ<sub>0</sub> = 0.215: observed minus expected.</li>
+    <li><b>95% CI of the Difference</b> is an interval for µ − 5. Add 5 back: we are 95% confident that µ is in <b>[5.08 ; 5.35]</b>.</li>
+  </ul>
+  <div class="key"><b>Consistency check:</b> the CI of the difference excludes 0 exactly when the two-sided p &lt; 0.05. If it contains 0, p ≥ 0.05.</div>
+  <p class="trap">"We are 95% confident µ is between 0.0803 and 0.3496." Wrong, because that is the difference. Also wrong: "everyone spends 5.215 ± 1.876".</p>
+  <p class="trap">Check n first. If N = 18 (and normality is unknown), say the test should not be used.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 13</span></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">From the beer table, select the correct sentence.</p>
+      <div class="opts"><button>We reject H0 because t = 3.134 is far from 5.</button><button>We cannot reject H0 because the standard error 0.0686 &gt; 0.05.</button><button>We reject H0 because the two-sided p-value is below the significance level.</button><button>We cannot reject H0 because 5.215 is close to 5.</button></div>
+      <p class="why">Decide with p vs α only. Comparing t with 5 or SE with 0.05 is meaningless (the 2024 MCQ 6 distractors).</p></div>
+    <div class="ex" data-type="num" data-a="5.3496" data-tol="0.002"><p class="q">Upper bound of the 95% CI for µ itself?</p>
+      <div class="numrow"><input inputmode="decimal" aria-label="Upper bound"><button class="btn">Check</button></div>
+      <p class="why">5 + 0.3496 = 5.3496.</p></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">Test value 2 for "number of pets", Mean Difference = 1.081, CI of difference [0.99 ; 1.18]. The sample mean is…</p>
+      <div class="opts"><button>1.081</button><button>3.081</button><button>2</button><button>0.99</button></div>
+      <p class="why">x̄ = µ<sub>0</sub> + mean difference = 2 + 1.081 (2023 MCQ 13).</p></div>
+  </div>
+</article>
+
+<!-- ============ 14 ============ -->
+<article class="lesson" data-part="Choosing &amp; running tests" data-title="Two independent samples">
+  <div class="ltag">Lesson 14 · Chapter 3 part 3</div>
+  <h2>Two independent samples: Levene first, then line 1 or line 2</h2>
+  <div class="goal"><b>You'll be able to</b>read the Independent Samples Test table in the right order and explain why.</div>
+  <p>Question: do Netflix subscribers and non-subscribers have the same mean income? H0: µ<sub>yes</sub> = µ<sub>no</sub>, H1: µ<sub>yes</sub> ≠ µ<sub>no</sub>. Both groups must have <b>more than 50</b> cases. If either has fewer, the test is not relevant.</p>
+  <p>SPSS runs three tests at once:</p>
+  <ol><li><b>Levene's test</b> for equality of variances. H0: the two groups have the same dispersion.</li><li>A <b>t test</b> assuming equal variances (line 1).</li><li>A <b>Welch test</b> not assuming equal variances (line 2).</li></ol>
+  <div class="spss"><table><caption>Independent Samples Test: household income (K$)</caption><thead><tr><th rowspan="2"></th><th colspan="2">Levene's Test</th><th rowspan="2">t</th><th rowspan="2">df</th><th rowspan="2">Sig. (2-tailed)</th><th rowspan="2">Mean Diff.</th><th colspan="2">95% CI of the Difference</th></tr><tr><th>F</th><th>Sig.</th><th>Lower</th><th>Upper</th></tr></thead>
+    <tbody><tr><td class="lab">Equal variances assumed</td><td>1.612</td><td>.219</td><td>1.097</td><td>4998</td><td>.272</td><td>3.167</td><td>−2.490</td><td>8.824</td></tr>
+    <tr><td class="lab">Equal variances not assumed</td><td></td><td></td><td>1.299</td><td>513.684</td><td>.195</td><td>3.167</td><td>−1.622</td><td>7.956</td></tr></tbody></table></div>
+  <div class="key"><b>Read it in two steps.</b><br>1 · Levene Sig. = 0.219 &gt; 0.05, so we cannot reject equal variances. Read <b>line 1</b>.<br>2 · On line 1, Sig. (2-tailed) = 0.272 &gt; 0.05, so we fail to reject H0. Mean income does not differ significantly (CI [−2.49 ; 8.82] contains 0).<br>If Levene Sig. had been &lt; 0.05, you would read <b>line 2 (Welch)</b> instead.</div>
+  <p>The sample means were 55.3K vs 52.1K, yet there is no significant difference. A gap between two samples is not automatically a gap in the population. That is exactly why we test.</p>
+  <p>df on line 1 = n<sub>1</sub> + n<sub>2</sub> − 2 = 4998. The Welch line has a decimal df.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 14</span></div>
+    <div class="spss"><table><caption>Independent Samples Test: monthly streaming spend (€), students (n = 240) vs non-students (n = 90)</caption><thead><tr><th rowspan="2"></th><th colspan="2">Levene's Test</th><th rowspan="2">t</th><th rowspan="2">df</th><th rowspan="2">Sig. (2-tailed)</th><th rowspan="2">Mean Diff.</th><th colspan="2">95% CI of the Difference</th></tr><tr><th>F</th><th>Sig.</th><th>Lower</th><th>Upper</th></tr></thead>
+      <tbody><tr><td class="lab">Equal variances assumed</td><td>18.420</td><td>.000</td><td>2.202</td><td>328</td><td>.028</td><td>4.700</td><td>.501</td><td>8.899</td></tr>
+      <tr><td class="lab">Equal variances not assumed</td><td></td><td></td><td>1.831</td><td>118.784</td><td>.070</td><td>4.700</td><td>−.382</td><td>9.782</td></tr></tbody></table></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">Which line do you read, and why?</p>
+      <div class="opts"><button>Line 1, because Levene's p &lt; 0.05 means equal variances</button><button>Line 2, because Levene's p &lt; 0.05 rejects equal variances</button><button>Line 1, always</button><button>Whichever line has the smaller p-value</button></div>
+      <p class="why">Levene's H0 is equal variances. p = .000 rejects it, so use Welch (line 2).</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">Your conclusion at α = 5%?</p>
+      <div class="opts"><button>Mean spend differs significantly (p = .028).</button><button>Students spend more in the population, since 4.7 &gt; 0.</button><button>Not enough evidence that mean spend differs (p = .070 &gt; .05); the CI contains 0.</button><button>The test is invalid because the groups have different sizes.</button></div>
+      <p class="why">Line 2 gives p = .070. Reading line 1 would flip the conclusion. Unequal group sizes are fine as long as both exceed 50.</p></div>
+    <div class="ex" data-type="mcq" data-a="3"><p class="q">You compare mean ratings of 120 men and 35 women. You should…</p>
+      <div class="opts"><button>run the independent t test</button><button>run the Welch test</button><button>run the paired t test</button><button>say the test is not relevant: the women's group (35) is below 50</button></div>
+      <p class="why">Both groups must have more than 50 cases.</p></div>
+  </div>
+</article>
+
+<!-- ============ 15 ============ -->
+<article class="lesson" data-part="Choosing &amp; running tests" data-title="Paired t test">
+  <div class="ltag">Lesson 15 · Chapter 3 part 3 (to slide 21)</div>
+  <h2>Paired samples: before and after on the same cases</h2>
+  <div class="goal"><b>You'll be able to</b>recognise paired data and read the paired test.</div>
+  <p>When each row is the <b>same case measured twice</b> (old vs new kebab recipe tasted by the same customer, weight before and after Christmas), compute each row's difference and test whether the <b>mean difference is 0</b>.</p>
+  <div class="tw"><table class="t"><tr><th>Customer</th><th>Before</th><th>After</th><th>Change</th></tr><tr><td>Adam</td><td>14</td><td>15</td><td>+1</td></tr><tr><td>Beatrix</td><td>23</td><td>25</td><td>+2</td></tr><tr><td>Clara</td><td>45</td><td>46</td><td>+1</td></tr></table></div>
+  <p>H0: µ<sub>before</sub> = µ<sub>after</sub> (mean difference = 0). H1: µ<sub>before</sub> ≠ µ<sub>after</sub>. Paired designs are more accurate because each person is compared with themselves, which removes most individual differences.</p>
+  <div class="spss"><table><caption>Paired Samples Test (before − after)</caption><thead><tr><th rowspan="2"></th><th rowspan="2">Mean</th><th rowspan="2">Std. Deviation</th><th colspan="2">95% CI of the Difference</th><th rowspan="2">t</th><th rowspan="2">df</th><th rowspan="2">Two-Sided p</th></tr><tr><th>Lower</th><th>Upper</th></tr></thead>
+    <tbody><tr><td class="lab">before − after</td><td>−1.870</td><td>6.840</td><td>−3.081</td><td>−.659</td><td>−3.056</td><td>124</td><td>.003</td></tr></tbody></table></div>
+  <p>Mean difference −1.87 (before − after &lt; 0, so after is higher). The CI excludes 0 and p = .003 &lt; .05, so <b>reject H0</b>: grades changed, and probably increased.</p>
+  <p class="trap">Two columns "before" and "after" are paired <b>only</b> if each row is the same individual. If you are not told so, treat them as independent.</p>
+
+  <div class="sheet"><div class="sh"><span>Worksheet 15</span></div>
+    <div class="ex" data-type="mcq" data-a="0"><p class="q">You record the price of the same 80 computers in France and in Belgium (one row per computer).</p>
+      <div class="opts"><button>Paired t test</button><button>Independent t test</button><button>Chi² test</button><button>One-sample t test against 0</button></div>
+      <p class="why">The same product measured in two places makes the data paired (slide example).</p></div>
+    <div class="ex" data-type="mcq" data-a="2"><p class="q">A paired test gives mean difference (before − after) = +0.4, CI [−0.3 ; 1.1], p = 0.26. Conclusion?</p>
+      <div class="opts"><button>Values decreased significantly.</button><button>Values increased significantly.</button><button>No significant change: p &gt; 0.05 and the CI contains 0.</button><button>We proved nothing changed.</button></div>
+      <p class="why">Fail to reject H0, which is not the same as proving equality.</p></div>
+    <div class="ex" data-type="mcq" data-a="1"><p class="q">What is the main difference between independent and dependent samples?</p>
+      <div class="opts"><button>Independent samples are larger.</button><button>Dependent samples match each measurement in one group with one in the other; independent samples have no such link.</button><button>Dependent samples come from two populations.</button><button>There is none for the t test.</button></div>
+      <p class="why">This is the 2024 open question (1 pt), word for word.</p></div>
+  </div>
+  <div class="goal" style="margin-top:8px"><b>Finished?</b>Take the full mock exam (10 MCQ + open problems) on your <i>Stats Mid-Term Mock</i> page, under exam conditions.</div>
+</article>
+
+<div class="pager"><button class="btn ghost" id="prev">← Previous</button><button class="btn" id="next">Next lesson →</button></div>
+</main>
+</div>
+
+<script>
+const lessons=[...document.querySelectorAll("article.lesson")];
+let done=new Set(); try{done=new Set(JSON.parse(localStorage.getItem("done")||"[]"))}catch(e){}
+let cur=0; try{cur=Math.min(+localStorage.getItem("cur")||0,lessons.length-1)}catch(e){}
+const side=document.getElementById("side"), msel=document.getElementById("msel");
+function buildNav(){
+  side.innerHTML=""; msel.innerHTML=""; let lastPart="";
+  lessons.forEach((l,i)=>{
+    if(l.dataset.part!==lastPart){lastPart=l.dataset.part;const p=document.createElement("div");p.className="part";p.innerHTML=lastPart;side.appendChild(p)}
+    const b=document.createElement("button");b.innerHTML=`<span class="n">${String(i+1).padStart(2,"0")}</span><span>${l.dataset.title}</span>`;
+    b.onclick=()=>go(i); if(done.has(i))b.classList.add("done"); if(i===cur)b.setAttribute("aria-current","true"); side.appendChild(b);
+    const o=document.createElement("option");o.value=i;o.innerHTML=`${i+1}. ${l.dataset.title}${done.has(i)?" ✓":""}`;msel.appendChild(o);
+  });
+  msel.value=cur;
+  document.getElementById("meter").style.width=(done.size/lessons.length*100)+"%";
+  document.getElementById("ptext").textContent=`${done.size} of ${lessons.length} lessons done`;
+}
+function go(i){cur=i;lessons.forEach((l,j)=>l.hidden=j!==i);try{localStorage.setItem("cur",i)}catch(e){}
+  document.getElementById("prev").disabled=i===0;const nx=document.getElementById("next");nx.hidden=i===lessons.length-1;
+  buildNav();window.scrollTo({top:0});}
+msel.onchange=()=>go(+msel.value);
+document.getElementById("prev").onclick=()=>cur>0&&go(cur-1);
+document.getElementById("next").onclick=()=>cur<lessons.length-1&&go(cur+1);
+
+function checkLesson(li){const exs=[...lessons[li].querySelectorAll('.ex[data-type="mcq"],.ex[data-type="num"]')];
+  if(exs.length&&exs.every(e=>e.dataset.solved==="1")){done.add(li);try{localStorage.setItem("done",JSON.stringify([...done]))}catch(e){}buildNav()}}
+lessons.forEach((l,li)=>{
+  l.querySelectorAll('.ex').forEach(ex=>{
+    const why=ex.querySelector(".why"); if(why) why.hidden=true;
+    if(ex.dataset.type==="mcq"){
+      const bs=[...ex.querySelectorAll(".opts button")], a=+ex.dataset.a;
+      bs.forEach((b,j)=>b.onclick=()=>{bs.forEach(x=>x.classList.remove("right","wrong"));
+        if(j===a){b.classList.add("right");ex.classList.add("ok");ex.classList.remove("no");ex.dataset.solved="1";why.innerHTML="<b>Right.</b> "+why.dataset.t}
+        else{b.classList.add("wrong");ex.classList.add("no");ex.classList.remove("ok");why.innerHTML="<b>Not quite. Try another option.</b> Hint: reread the lesson's key box above."}
+        why.hidden=false;checkLesson(li)});
+      why.dataset.t=why.innerHTML;
+    }
+    if(ex.dataset.type==="num"){
+      const inp=ex.querySelector("input"),btn=ex.querySelector("button"),a=+ex.dataset.a,tol=+ex.dataset.tol;why.dataset.t=why.innerHTML;
+      const run=()=>{const v=parseFloat(String(inp.value).replace(",","."));
+        if(!isNaN(v)&&Math.abs(v-a)<=tol+1e-9){ex.classList.add("ok");ex.classList.remove("no");ex.dataset.solved="1";why.innerHTML="<b>Right.</b> "+why.dataset.t}
+        else{ex.classList.add("no");ex.classList.remove("ok");why.innerHTML=isNaN(v)?"Type a number first.":"<b>Not yet.</b> Check your arithmetic and try again. <button class='btn ghost' type='button' style='padding:4px 10px;font-size:13px'>Show working</button>";
+          const sb=why.querySelector("button");if(sb)sb.onclick=()=>{why.innerHTML="<b>Working:</b> "+why.dataset.t}}
+        why.hidden=false;checkLesson(li)};
+      btn.onclick=run; inp.addEventListener("keydown",e=>{if(e.key==="Enter")run()});
+    }
+  });
+});
+
+/* margin of error widget */
+(function(){const n=document.getElementById("me-n"),s=document.getElementById("me-s"),seg=document.getElementById("me-cl");let z=1.96;
+  const X=v=>20+(v-24)/20*600;
+  function upd(){const N=+n.value,S=+s.value,se=S/Math.sqrt(N),me=z*se,lo=34-me,hi=34+me;
+    document.getElementById("me-n-o").textContent=N;document.getElementById("me-s-o").textContent=S;
+    document.getElementById("me-se").textContent=se.toFixed(3);document.getElementById("me-me").textContent=me.toFixed(3);
+    const x1=Math.max(20,X(lo)),x2=Math.min(620,X(hi));const bar=document.getElementById("me-bar");bar.setAttribute("x",x1);bar.setAttribute("width",Math.max(2,x2-x1));
+    const lb=document.getElementById("me-lb"),ub=document.getElementById("me-ub");lb.setAttribute("x",Math.max(40,x1));ub.setAttribute("x",Math.min(600,x2));
+    lb.textContent=lo.toFixed(2);ub.textContent=hi.toFixed(2);
+    if(x2-x1<70){lb.setAttribute("x",x1-26);ub.setAttribute("x",x2+26)}
+    const w=document.getElementById("me-warn");
+    if(N<30){w.textContent="n < 30: only usable if the variable is normal";w.style.color="var(--bad)"}else if(N<=50){w.textContent="30–50: grey zone (the exam avoids it)";w.style.color="var(--muted)"}else{w.textContent="n > 50: fine";w.style.color="var(--ok)"}}
+  n.oninput=upd;s.oninput=upd;
+  seg.querySelectorAll("button").forEach(b=>b.onclick=()=>{seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");z=+b.dataset.z;upd()});
+  upd();})();
+
+/* p-value widget */
+(function(){const svg=document.getElementById("pv-svg"),sl=document.getElementById("pv-t"),seg=document.getElementById("pv-tail");let tail="two";
+  const pdf=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+  function cdf(x){const t=1/(1+0.2316419*Math.abs(x)),d=0.3989423*Math.exp(-x*x/2);let p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p}
+  const X=v=>40+(v+4)/8*560, Y=v=>170-v/0.42*140;
+  function area(a,b){let d=`M${X(a)} ${Y(0)}`;for(let v=a;v<=b+1e-9;v+=0.02)d+=`L${X(v).toFixed(1)} ${Y(pdf(v)).toFixed(1)}`;return d+`L${X(b)} ${Y(0)}Z`}
+  function upd(){const t=+sl.value;document.getElementById("pv-t-o").textContent=t.toFixed(2);
+    let p,shapes="",crit=[];
+    if(tail==="two"){p=2*(1-cdf(Math.abs(t)));const a=Math.abs(t);if(a<4){shapes+=`<path d="${area(a,4)}" fill="var(--pen)" fill-opacity=".35"/><path d="${area(-4,-a)}" fill="var(--pen)" fill-opacity=".35"/>`}crit=[-1.96,1.96]}
+    else if(tail==="left"){p=cdf(t);if(t>-4)shapes+=`<path d="${area(-4,Math.min(t,4))}" fill="var(--pen)" fill-opacity=".35"/>`;crit=[-1.645]}
+    else{p=1-cdf(t);if(t<4)shapes+=`<path d="${area(Math.max(t,-4),4)}" fill="var(--pen)" fill-opacity=".35"/>`;crit=[1.645]}
+    let curve=`M${X(-4)} ${Y(pdf(-4))}`;for(let v=-4;v<=4.001;v+=0.02)curve+=`L${X(v).toFixed(1)} ${Y(pdf(v)).toFixed(1)}`;
+    let c=crit.map(v=>`<line x1="${X(v)}" x2="${X(v)}" y1="20" y2="${Y(0)}" stroke="var(--bad)" stroke-dasharray="4 4"/><text x="${X(v)}" y="14" text-anchor="middle" font-size="11" fill="var(--bad)">${v>0?"+":""}${v}</text>`).join("");
+    const ticks=[-4,-3,-2,-1,0,1,2,3,4].map(v=>`<text x="${X(v)}" y="190" text-anchor="middle" font-size="11" fill="var(--muted)">${v}</text>`).join("");
+    svg.innerHTML=`${shapes}<path d="${curve}" fill="none" stroke="var(--ink)" stroke-width="1.5"/><line x1="40" x2="600" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--rule)"/>${c}${ticks}
+      <line x1="${X(t)}" x2="${X(t)}" y1="40" y2="${Y(0)}" stroke="var(--pen)" stroke-width="2.5"/><text x="${X(t)}" y="34" text-anchor="middle" font-size="12" font-weight="600" fill="var(--pen)">tSTAT</text>
+      <text x="320" y="206" text-anchor="middle" font-size="11" fill="var(--muted)">test statistic if H0 is true (centred on 0 = µ0)</text>`;
+    document.getElementById("pv-p").textContent=p<0.001?"< 0.001":p.toFixed(3);
+    const v=document.getElementById("pv-v");if(p<0.05){v.textContent="p < α → reject H0";v.style.color="var(--ok)"}else{v.textContent="p ≥ α → fail to reject H0";v.style.color="var(--bad)"}}
+  sl.oninput=upd;seg.querySelectorAll("button").forEach(b=>b.onclick=()=>{seg.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");tail=b.dataset.tail;upd()});upd();})();
+
+go(cur);
+</script>
+
+</body>
+</html>
